@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.telephony.SmsManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -16,24 +17,16 @@ class CountActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val editPhone: EditText = findViewById(R.id.main_editPhone)
-        val updateButton: Button = findViewById(R.id.main_count)
-        val contactsButton: Button = findViewById(R.id.main_contacts)
-        val resultText: TextView = findViewById(R.id.main_result)
-
-        val smsProvider = SMSHelper(this)
+        val phone = intent.extras?.get("phone").toString()
 
         requestPermission()
+        val countMessages = SMSHelper(this).countMessages(phone)
 
-        updateButton.setOnClickListener {
-            val phone = editPhone.text.toString()
-            resultText.text = "${smsProvider.countMessages(phone)} message(s) for $phone"
-        }
+        val textView: TextView = findViewById(R.id.count_phone)
+        val countView: TextView = findViewById(R.id.count_count)
 
-        contactsButton.setOnClickListener {
-            val intent = Intent(this, PhonesActivity::class.java)
-            startActivity(intent)
-        }
+        textView.text = phone
+        countView.text = "$countMessages messages"
     }
 
     private fun requestPermission() {
